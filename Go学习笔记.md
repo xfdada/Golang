@@ -544,4 +544,214 @@
             res := a(10,20)
         }
     全局匿名函数：
-    如果将匿名函数赋值给一个全局变量，那么这个匿名函数就成为了一个全局匿名函数，可以在程序有效范围内访问
+    如果将匿名函数赋值给一个全局变量，那么这个匿名函数就成为了一个全局匿名函数，可以在程序有效范围内
+### 闭包
+    返回的是一个匿名函数，但是这个匿名函数引用到函数外的n，因此这个匿名函数就和n形成一个整体，这就构成了闭包，如下示例代码
+
+    func Addup()func (int)int{
+        var n int = 10
+        return func (x int) int{
+            n += x
+            return n
+        }
+    }
+
+## 常用字符串函数
+    以下函数需要引入import “strings”包
+
+    1.统计字符串长度，按字节  len（str） 是一个内置函数
+
+    2.字符串转整数
+	n,rr := strconv.Atoi("123")
+	if err !=nil{
+		fmt.Println("转换错误",err)
+	}else{
+		fmt.Println("转换的结果是",n)
+	}
+
+	3.整数转字符串
+	str4 := strconv.Itoa(2322)
+	fmt.Printf("str的类型为%T,值为%v \n",str4,str4)
+
+	4.字符串转byte
+	var list = []rune("xiang")
+	fmt.Printf("list = %c \n",list)
+
+	5.[]byte 转字符串 
+	str5 := string([]byte{65,66,67})
+	fmt.Printf("str5 = %v \n",str5)
+
+	6.10进制转2,8,16进制
+	str5 = strconv.FormatInt(123,16)
+	fmt.Printf("str5 = %v \n",str5)
+
+	7.查找字符是否在字符串中
+	b  := strings.Contains("hello","o")
+	fmt.Printf("b = %v \n",b)
+
+	8.统计一个字符串有几个指定字符串
+	c := strings.Count("hello","le")
+	fmt.Printf("c = %v \n",c)
+
+	9.不区分大小写的字符串比较（==是区分大小写）
+	b = strings.EqualFold("abc","ABc")
+	fmt.Printf("b = %v \n",b)
+
+	10.返回子串在字符串第一次出现的位置，如果不存在的话，返回-1
+	c = strings.Index("小白兔白又白","白")
+	fmt.Printf("c = %v \n",c)    //3 一个汉字占用三个字节
+
+	11.返回子串在字符串最后一次出现的位置，如果不存在的话，返回-1
+	c = strings.LastIndex("小白兔白又白","白")
+	fmt.Printf("c = %v \n",c)    //15 一个汉字占用三个字节
+
+	12.将指定的子串 替换成另一个子串 strings.Replace(b1,"白","黑",n) 
+	// n可以指定你希望替换几个，如果n=-1时表示全部替换
+	b1 := "小白兔白又白"
+	str6 :=strings.Replace(b1,"白","黑",-1)
+	fmt.Printf("str6 = %v \n",str6)
+
+	13按照指定的某个字符。为分隔标识，将一个字符串拆分成数组
+	strArr :=strings.Split("小白兔白又白","白")
+	fmt.Printf("strArr = %v \n",strArr)
+
+
+    14.将字符串的字母进行大小写转换 strings.ToLower（）strings.ToUpper()
+	str4 = "abcdEFG"
+
+	str2 = strings.ToLower(str4)
+	str2 = strings.ToUpper(str4)
+	fmt.Printf("str2 = %v \n",str2)
+
+	15.去掉字符串两端的空格 strings.TrimSpace()
+	str4 = " aaabbb "
+	str4 = strings.TrimSpace(str4)
+	fmt.Printf("str4 = %v \n",str4)
+
+	16.去掉字符串两端的指定字符 strings.Trim()
+	str4 = "* 刘大哥，诶，我滴郎诶 *"
+	str4 = strings.Trim(str4," *")
+	fmt.Printf("str4 = %v \n",str4)
+
+	17.判断字符串是否以指定字符串开头 strings.HasPrefix(str,need)
+
+	str4 = "abcdEFG"
+	s :=strings.HasPrefix(str4,"a")
+	fmt.Printf("s = %v \n",s)
+
+	18.判断字符串是否以特定字符结尾 HasSuffix(str,need)
+
+	file :="123.jpg"
+	s = strings.HasSuffix(file,".jpg")
+	fmt.Printf("s = %v \n",s)
+
+### 时间函数
+    介绍：使用时间日期相关函数时需要引入 import "time"包
+
+    time.Now().Format("2006-01-02 15:04:05")
+    Format（“2006-01-02 15:04:05”）里面时间为固定的，数字不能修改
+    time.Now().Format("2006-01-02 15:04:05")返回的是当前时间
+
+    时间常量{
+        Nanosecond Duration = 1  //纳秒
+        Microsecond         =1000*Nanosecond //微秒
+        Millisecond         =1000*Microsecond//毫秒
+        Second              =1000*Millisecond//秒
+        Minute              =60*Second
+        Hour                =60*Minute
+    }
+
+    Unix和UnixNano
+
+    time.Now().Unix()为当前的秒数
+    time.Now().UnixNano()为当前的纳秒数
+
+### 错误处理
+    Go中会抛出一个panic的异常 然后在defer中通过recover捕获这个异常
+    recover()是一个内置函数 
+    func test() int{
+        defer func(){
+            err := recover() //该函数会自动捕获错误
+            if err !=nil{
+                fmt.Println("发生错误——",err)
+            } 
+        }()
+        num :=10
+        num2 :=0
+        res := num/num2
+        return res
+    }
+    func main(){
+        test()
+        fmt.Println("main********")
+    }
+
+    上面的代码错误会打印出来，并且还会继续执行
+
+
+    自定义错误：
+    需要引入 import “errors”
+    Go程序中，支持自定义错误，使用errors.New()和panic内置函数
+    具体流程是：
+    1.errors.New(“错误说明”),会返回一个error类型的值，表示一个错误
+    2.panic内置函数，接收一个interface{}类型的值（也就是任何值）作为参数。可以接收error类型的变量，输出错误信息，并且退出程序
+
+    func config(name string)(err error){
+        if name=="config.ini"{
+            return nil
+        }else{
+            return errors.New("读取文件错误。。。。")
+        }
+    }
+
+    func test01(){
+        err := config("config1.ini")
+        if err != nil{
+            panic(err)
+        }
+        fmt.Println("继续执行下面代码......")
+        }
+    func main(){
+        test01()
+        fmt.Println("main********")
+    }
+    上面代码示例解读 test01（）调用config并且传入config1.ini 由于config.ini不等于config1.ini所以创建一个自定义错误，由于panic会捕获错误并且会中断程序的执行。
+## 数组和切片
+
+### 数组
+    数组可以存放多个同一类型的数据。数组也是一种数据类型，在Go中，数组是值类型
+
+    数组的定义 var 数组名[数组大小]数据类型
+
+    定义：var a[5]int  赋值： a[0] = 1,a[2]=20
+    数组的地址可以通过数组名来获取
+    数组的第一个元素的地址就是数组的首地址
+    数组的地址是连续的如int64 则第二个元素的地址为首地址加上8
+    &a[0] =>0x21525500   &a[1]=>0x21525508
+    四种初始化数组的方法
+    第一种：
+        var array[3]int = [3]int{1,2,3}
+    第二种：
+        var array1 = [3]int{4,5,6}
+    第三种:
+        var array3 = [...]int{7,8,9}
+    第四种：
+        array4 := [...]int{10,11,12}
+
+### 数组的遍历
+    1.常规遍历 
+        for i:=0;i<len(array);i++{
+            fmt.Println(array[i])
+        }
+    2.for-range
+        for index,value:=range array01{
+
+        }
+    for- range说明
+     for index,value:=range array01{
+    }
+    1.index是数组的下标
+    2.value 是该下标的值
+    3.他们都是在for循环内部的变量
+    4.遍历数组到时候，如果不想使用下标index，可以用下划线_
+    5.index和value不是固定的，可以随便取名字
