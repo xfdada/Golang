@@ -755,3 +755,219 @@
     3.他们都是在for循环内部的变量
     4.遍历数组到时候，如果不想使用下标index，可以用下划线_
     5.index和value不是固定的，可以随便取名字
+### 数组使用细节
+    1.数组是多个相同类型的数据组合，一个数组一旦声明了，他的长度是固定的，不能动态变化 示例：
+        var arr[3]int = [3]int{1,2,3}
+        arr[2] = 1.1 //报错 ，原因是数据类型不是整数
+
+        arr[3] = 10	//报错 原因是超出数组长度
+
+    2.数组中的元素可以是任何数据，包括值类型和引用类型，但是不能混用
+
+    3.数组创建后如果没有赋值会有默认值 数值型为 0 字符串为空字符串 bool为 false
+
+    4.数组下标必须在指定范围内使用，否则包panic：数组越界
+
+    5.Go的数组属于值类型，在默认情况下属于值传递，因此数组间不会互相影响
+
+    6.如果想要在函数中修改原来的数组，可以引用传递的方式来（指针）
+        示例：
+        func arr(arr*[3]string) {
+            fmt.Printf("arr[1]的地址为%v \n",&arr[1])
+            fmt.Printf("arr[1]的值为%v \n",arr[1])
+            arr[2] = "小红"
+        }
+        name :=[...]string{"小明","小玲","小猪"}
+        arr(&name)
+
+    7.长度是数组类型的一部分，在传递函数参数时需要考虑数组的长度
+
+### 切片 slice
+    介绍：
+        1.切片是数组的一个引用，因此切片是引用类型，在进行传递时，需要遵守引用传递的机制
+        2.切片和数组类似，遍历切片和长度计算与数组一致
+        3.切片的长度是可变的，是一个动态变化的数组
+        4.基本语法： var 切片名[]数据类型 如 var name[]string
+
+    slice的使用：
+        方法一：定义一个切片，然后让slice去引用创建好的数组，如下列代码所示：
+            var arr[]int = [...]int{1,2,3,4}
+            var slice = arr[1:3]
+            slice是将arr数组中下标为1到下标为2的值存储到slice中
+
+        方法二：通过make来创建slice  用法 var a[]type = make([]type,len,[cap]) 参数解析 []type为切片数据类型，len为切片长度，cap为容量，可选 如果分配了cap，那么cap>=len
+            1.通过make方式创建slice可以指定切片的大小和容量
+            2.如果没有给切片各个元素赋初值那么就会使用默认值
+            3.通过make方式创建切片对应的数组是由make底层维护，对外不可见，只能通过slice去访问各个元素
+
+        方法三：定义一个slice直接就指定具体数组，使用原理类似make的方式
+        示例：
+	    var movies[]string = []string{"罗小黑战记","大鱼海棠","齐天大圣"}
+
+    切片的遍历和数组一致：for和for-range两种方式
+### slice切片的使用注意事项
+    1.切片初始化时 var slice = arr[startIndex:endIndex]
+    说明：从arr数组下标为startInde，取到下标为endIndex的元素（不包含arr[endIndex]
+    2.切片初始化时，仍然不能越界。范围在[0-len(arr)]之间，但是可以动态增长
+    var slice = arr[0:end]可以简写成 var slice = arr[:end]
+    var slice = arr[start:len(arr)]可以简写成 var slice = arr[start:]
+     var slice = arr[0:len(arr)]可以简写成 var slice = arr[:]
+
+     3.cap是一个内置函数，用于统计切片的容量，即最大可以存放多少个元素
+
+     4.切片定义完后还不能使用，因为本身是一个空的，需要让其引用到一个数组，或者make一个空间
+
+     5.切片可以继续切片 继续切片后的数据指向的是同一个数据地址
+
+     6.使用append内置函数可以对切片进行动态追加
+        	var movies[]string = []string{"罗小黑战记","大鱼海棠","齐天大圣"}
+	        movies = append(movies,"复仇者联盟4")       
+        解释上述代码：append本质上是创建了一个新的数组，把原来数组的值拷贝了一份到新的数组上 movies重新引用到新的数组上 新的数组是在底层操作，程序员是不可见的
+    7.切片的拷贝操作
+        使用copy内置函数完成拷贝
+        copy(new,old) new 表示需要拷贝到是切片，old是被拷贝的切片
+        new 和old的数据空间是独立的，互不影响
+        当new的长度小于old的长度时 只会拷贝到new长度的数据
+
+## map
+    介绍：map是key-value数据结构，有称为字段或者关联数组。类似于集合
+
+    声明：var map 变量名     map[keytype]valuetype
+
+    key的类型：bool，数字，string，指针，channel还可以是接口，结构体，数组。 通常key为int和string
+    slice，map和function不能用来作为key
+
+    map在使用前一定要make
+    map的key是不能重复的，如果重复了则为最后这个key-value为准
+    map的value是可以相同的
+    map的key-value是无序的
+
+### map的三种定义形式
+    第一种：
+    var a map[string]string
+    a = make(map[string]string,10)
+    第二种：
+    citys :=make(map[string]string,10)
+    第三种：
+    student := map[string]string{
+        "stu1":"xiaoming",
+        "stu2":"lihua",
+    }
+### map的crud
+    map更新 map[key] = value 如果key存在那么就更新其value
+    如果key不存在的话，那么就是增加
+
+    map删除：delete（map,"key"），key是一个内置函数，如果key存在，就删除该key-value如果key不存在的话不操作，但是也不会报错
+
+    注意如果要删除map所有的key，没有一个专门的方法一次性删除，可以遍历可以逐个删除，或者map = make(...),make一个新的。让原来的成为来及，被gc回收
+
+
+## 面向对象
+
+### Golang面向对象编程说明
+
+    1.Golang 也支持面向对象编程（OOP），但是和传统的面向对象编程有区别，并不是纯粹的面向对象语言
+
+    2.Golang没有类（class），Go语言的结构体（struct）和其他语言的类是同等地位的
+
+    3.Golang面向对象编程非常简洁，去掉了传统的OOP语言的继承，方法重载，构造函数和析构函数，隐藏的this指针等等
+
+    4.Golang仍然有面向对象的继承，封装和多态的特性，只是实现方式和其他语言不一样，Golang没有extends关键字，继承是通过匿名字段来实现的
+
+    5.Golang面向对象很优雅，OOP本身就是语言系统的一部分，通过接口关联，耦合性低，也非常灵活。
+### 声明struct
+    type 结构体名称 struct{
+        field type
+        field2 type
+    }
+
+    type Cat struct{
+        Name string
+        Age  int
+    }
+
+    字段都有默认值
+
+    int-> 0 ，string-> “” bool->false  指针，slice，map->nil 即没有分配空间
+
+#### 创建struct变量和访问struct字段
+    方式一：直接声明
+        var person Person
+        person.name = "天明"
+
+    方式二：{}
+        var person Person = Person{}
+
+    方式三： -&
+    var person *Person = new（Person）
+    这是person是一个指针，可以通过(*person).nam=""来访问，但是也可以直接通过person.name=“”来访问 因为底层会对person.name进行处理，编译器会自动加上取值运算（*person）.name = “”
+    方式四：
+        var p *Person = &Person{}
+        该方式是通过指针访问的，标准的访问字段的方法是（*p）.name=""
+        但是为了程序员的使用方便也可以通过p.name=“”来访问原因是底层会对p.name进行处理，编译器会自动加上取值运算（*p）.name = “”
+
+    struct是值类型，默认是值拷贝。当通过指针来访问赋值变量时如下示例：
+        type Dog struct{
+            name string
+        }
+
+        var d = Dog{name:"小黑"}
+        var dd *Dog = &d
+        (*dd).name
+        只能用小括号把对象包起来用，因为.的运算符优先级高于*
+
+#### struct使用注意事项和细节
+    1.结构体的所有字段在内存中是连续的
+
+    2.结构体是用户单独定义的类型，和其他类型进行装换时需要有完全相同的字段
+
+    3.结构体进行type重新定义时，Golang认为是新的数据类型，但是相互间可以强转
+
+    4.struct的每一个字段上都可以写上一个tag，该tag可以通过反射机制获取，常见的使用场景就是序列化和反序列化
+
+#### struct方法的定义和声明
+    type A struct{
+        Num int
+    }
+
+    func (a A)test(){
+        fmt.Println(a.Num)
+    }
+    (a A)体现 test方法是和A类型绑定的
+
+
+    声明：
+
+    func (recevier type)menthodName(参数列表)(返回值列表){
+        方法体
+        return 返回值
+    }
+    recevier type:表示这个方法和type这个类型进行绑定，或者说该方法作用于type类型
+    type可以是struct 也可以是其他自定义类型
+
+    方法的使用注意事项和细节
+
+    1.struct是值类型，在方法中调用遵循传递机制，是值拷贝的传递方式
+    2.如果希望修改struct变量的值，可以通过结构体指针的方式来处理
+    3.Golang中方法用在指定的数据类型上，因此自定义类型都可以有方法
+    4.方法的访问控制范围和函数一致
+     
+
+### 工厂模式
+    使用工厂模式实现跨包创建结构体实例，如果model包的结构体变量首字母大写，在引入后其他包可以直接使用，但是结构体实小写时就无法引入。所以可以用工厂模式解决
+
+    工厂模式如下示例所示：
+
+    type student struct{
+        Name string
+        Score int
+    }
+
+    func NewStu(n string,s int)*student{
+        return &student{
+            Name:n,
+            Score:s,
+        }
+    }
+
+    代码解释：工厂模式的原理是通过有个对外访问的方法，在其方法中对该结构体实现创建实例，返回该实例的地址。
